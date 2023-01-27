@@ -4,6 +4,8 @@ $(() => {
 
 let exp = '';
 
+let regex = new RegExp("(?<=[-+*/])|(?=[-+*/])");
+
 function onReady() {
         $(document).on('click', '#btn-eq', getCalcValues);
         getHistory();
