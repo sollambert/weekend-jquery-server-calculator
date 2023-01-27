@@ -5,18 +5,19 @@ $(() => {
 let exp = '';
 
 function onReady() {
-        $(document).on('click', 'btn-eq', getCalcValues);
+        $(document).on('click', '#btn-eq', getCalcValues);
         getHistory();
 }
 
 function getCalcValues() {
-        let num1 = $('#num-1');
-        let num2 = $('#num-2');
-        let payload = `${num1}|${exp}|${num2}`;
-        putExpression(payload);
+        let num1 = $('#num-1').val();
+        let num2 = $('#num-2').val();
+        let payload = {expression: `${num1}|+|${num2}`};
+        postExpression(payload);
+        getHistory();
 }
 
-function putExpression(payload) {
+function postExpression(payload) {
         renderLast(slay.post('/eval', payload));
 }
 

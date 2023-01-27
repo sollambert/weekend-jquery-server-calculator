@@ -17,6 +17,7 @@ app.get('/history', (req, res) => {
 });
 
 app.post('/eval', (req, res) => {
+        console.log(req.body.expression)
         let splitExp = req.body.expression.split('|');
         let expression = '';
         let result = 0;
