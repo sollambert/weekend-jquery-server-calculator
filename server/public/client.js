@@ -25,6 +25,14 @@ function renderHistory(promise) {
         })
 }
 
-function render(id, string, className) {
-
+function render(id, string, className, remove) {
+        $(id).empty();
+        $(id).append(string);
+        if (className) {
+                if (remove) {
+                        $(id).removeClass(className);
+                } else {
+                        $(id).addClass(className);
+                }
+        }
 }
