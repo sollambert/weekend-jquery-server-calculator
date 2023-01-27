@@ -2,12 +2,33 @@ $(() => {
         onReady();
 });
 
+let exp = '';
+
 function onReady() {
+        $(document).on('click', 'btn-eq', getCalcValues);
         getHistory();
+}
+
+function getCalcValues() {
+        let num1 = $('#num-1');
+        let num2 = $('#num-2');
+        let payload = `${num1}${exp}${num2}`;
+        putExpression(payload);
+}
+
+function putExpression(payload) {
+        renderLast(slay.post('/eval', payload));
 }
 
 function getHistory() {
         renderHistory(slay.get('/history'));
+}
+
+function renderLast(promise) {
+        promise.then((res) => {
+                let result = res;
+                render('#div-result', `<strong>${result}</strong>`);
+        });
 }
 
 function renderHistory(promise) {
@@ -22,7 +43,7 @@ function renderHistory(promise) {
                         </div>`
                 }
                 render('#div-history', renderString);
-        })
+        });
 }
 
 function render(id, string, className, remove) {
