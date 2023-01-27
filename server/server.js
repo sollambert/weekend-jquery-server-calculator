@@ -4,6 +4,10 @@ const app = express();
 app.use(express.static('server/public'));
 app.use(express.urlencoded({extended: true}));
 
+let ops = ['+','-', '/', '*'];
+
+let regex = new RegExp("(?<=[-+*/])|(?=[-+*/])");
+
 const PORT = 8000;
 
 //Collection of strings representing past mathematical expressions
@@ -18,13 +22,21 @@ app.get('/history', (req, res) => {
 
 app.post('/eval', (req, res) => {
         console.log(req.body.expression)
-        let splitExp = req.body.expression.split('|');
+        let splitExp = req.body.expression.split(regex);
+        console.log(splitExp);
         let expression = '';
         let result = 0;
         for (let i in splitExp) {
                 expression += splitExp[i];
                 if (evalOp(splitExp[i])) {
                         splitExp[i] = opToObject(splitExp[i]);
+                        //console.log(splitExp);
+                        if (splitExp[i].op == '-' && ops.includes(splitExp[i-1].op)) {
+                                splitExp[i] = splitExp[i].op + splitExp[Number(i)+1];
+                                console.log(splitExp);
+                                splitExp.splice(Number(i)+1, 1);
+                                i--;
+                        }
                 }
         }
         result = evalOps(splitExp);
