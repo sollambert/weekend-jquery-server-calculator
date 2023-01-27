@@ -1,0 +1,7 @@
+$(() => {
+    onReady();
+});
+
+function onReady() {
+    
+}
