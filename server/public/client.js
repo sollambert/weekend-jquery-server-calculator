@@ -12,7 +12,7 @@ function onReady() {
 function getCalcValues() {
         let num1 = $('#num-1');
         let num2 = $('#num-2');
-        let payload = `${num1}${exp}${num2}`;
+        let payload = `${num1}|${exp}|${num2}`;
         putExpression(payload);
 }
 
