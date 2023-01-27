@@ -1,7 +1,7 @@
 $(() => {
-    onReady();
+        onReady();
 });
 
 function onReady() {
-    
+
 }
