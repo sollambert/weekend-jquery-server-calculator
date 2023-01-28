@@ -4,6 +4,7 @@ const ops = ['+', '-', '/', '*', '^'];
 //regex for splitting array by operator
 const opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
 
+//prefix to prepend logs
 const expPrefix = 'Expressions:'
 
 //function for splitting array into operator objects and check for negative values following operators
@@ -96,6 +97,31 @@ function opToObject(op) {
         return { op, func: evalOp(op), wgt }
 }
 
+//function for checking validity of a string expression
+//returns true or false depending on validity of input
+function checkCleanInput(exp) {
+        for (let i = 0; i < exp.length; i++) {
+                if (ops.includes(exp[i]) && ops.includes(exp[i - 1]) && exp[i] != '-') {
+                        console.log(expPrefix, 'Input rejected for 2 consecutive operators (non-negative)');
+                        return false;
+                } else if (exp[i] == '-'
+                && exp[i-1] == '-'
+                && exp[i-2] == '-') {
+                        console.log(expPrefix, 'Input rejected for >2 consecutive \'-\' operators');
+                        return false;
+                } else if (exp.match(/[A-Za-z]/)) {
+                        console.log(expPrefix, 'Input rejected for non-numeric characters');
+                        return false;
+                }
+        }
+        return true;
+}
+
+//splits array by regex that looks for operators and maintains integrity of non-operator strings within array
+function splitByOps(arr){
+        return arr.split(opsRegex);
+}
+
 //function for addition of an array of numbers
 //returns total sum
 function add(nums) {
@@ -156,30 +182,6 @@ function exp(nums) {
         return result;
 }
 
-//function for checking validity of a string expression
-//returns true or false depending on validity of input
-function checkCleanInput(exp) {
-        for (let i = 0; i < exp.length; i++) {
-                if (ops.includes(exp[i]) && ops.includes(exp[i - 1]) && exp[i] != '-') {
-                        console.log(expPrefix, 'Input rejected for 2 consecutive operators (non-negative)');
-                        return false;
-                } else if (exp[i] == '-'
-                && exp[i-1] == '-'
-                && exp[i-2] == '-') {
-                        console.log(expPrefix, 'Input rejected for >2 consecutive \'-\' operators');
-                        return false;
-                } else if (exp.match(/[A-Za-z]/)) {
-                        console.log(expPrefix, 'Input rejected for non-numeric characters');
-                        return false;
-                }
-        }
-        return true;
-}
-
-//splits array by regex that looks for operators and maintains integrity of non-operator strings within array
-function splitByOps(arr){
-        return arr.split(opsRegex);
-}
 
 /*function recurParenthesis(arr) {
         let result = 0;
