@@ -5,8 +5,14 @@ $(() => {
 let exp = '';
 
 function onReady() {
-        $(document).on('click', '#btn-eq', getCalcValues);
+        $(document).on('click', '#eq-btn', getCalcValues);
+        $(document).on('click', '.calc-btn', addToExpression);
+        $(document).on('click', '#clr-btn', clearExp);
         getHistory();
+}
+
+function clearExp() {
+        $('#expression').val('');
 }
 
 function getCalcValues() {
@@ -14,6 +20,13 @@ function getCalcValues() {
         let payload = {expression: exp};
         postExpression(payload);
         getHistory();
+}
+
+function addToExpression() {
+        let btn = $(this);
+        let value = btn.val();
+        let exp = $('#expression').val();
+        $('#expression').val(`${exp}${value}`);
 }
 
 function postExpression(payload) {
@@ -28,6 +41,10 @@ function renderLast(promise) {
         promise.then((res) => {
                 let result = res;
                 render('#div-result', `<strong>${result}</strong>`);
+        }).catch((err) => {
+                if (err == 400) {
+                        render('#div-result', '<strong>Bad input, do not use letters or double operators (negative values following an operator are fine)<strong>')
+                }
         });
 }
 

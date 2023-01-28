@@ -29,7 +29,6 @@ app.post('/eval', (req, res) => {
                 let expression = '';
                 let result = 0;
                 for (let i in splitExp) {
-                        expression += splitExp[i];
                         if (evalOp(splitExp[i])) {
                                 splitExp[i] = opToObject(splitExp[i]);
                                 //console.log(splitExp);
@@ -38,10 +37,17 @@ app.post('/eval', (req, res) => {
                                         console.log(splitExp);
                                         splitExp.splice(Number(i) + 1, 1);
                                         i--;
+                                        expression += splitExp[i+1];
+                                } else{
+
+                                expression += splitExp[i].op;
                                 }
+                        }else {
+
+                                expression += splitExp[i];
                         }
                 }
-                result = evalOps(splitExp);
+                result = evaluateExp(splitExp);
                 console.log(result);
                 expression += `=${result}`;
                 history.push(expression);
@@ -55,6 +61,39 @@ app.listen(PORT, () => {
 
 });
 
+/*function recurParenthesis(arr) {
+        let result = 0;
+        let lastParen
+        console.log(arr);
+        for (let i = 0; i < arr.length; i ++) {
+                if (arr[i] == '(') {
+                        recurParenthesis(arr.splice(i, arr.length - i))
+                }
+        }
+        for (let i = 0; i < arr.length; i ++) {
+                if (arr[i] == ')') {
+                        result = evaluateExp(arr.slice(arr.slice(0,i-1).lastIndexOf('('), i));
+                }
+        }
+        return result;
+}
+
+function recurParenthesis(arr, index) {
+        let result = 0;
+        console.log(arr);
+        for (let i = 0; i < arr.length; i ++) {
+                if (arr[i] == '(') {
+                recurParenthesis(arr.splice(i, arr.length - i))
+                }
+        }
+        for (let i = 0; i < arr.length; i ++) {
+                if (arr[i] == ')') {
+                        result = evaluateExp(arr.splice(arr.lastIndexOf('('), i));
+                }
+        }
+        return result;
+}*/
+
 function checkCleanInput(exp) {
         for (let i = 0; i < exp.length; i++) {
                 if (ops.includes(exp[i]) && ops.includes(exp[i - 1]) && exp[i] != '-') {
@@ -66,7 +105,7 @@ function checkCleanInput(exp) {
         return true;
 }
 
-function evalOps(arr) {
+function evaluateExp(arr) {
         console.log(arr);
         let weight = 3;
         let result = 0;
