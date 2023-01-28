@@ -1,4 +1,3 @@
-const e = require('express');
 const express = require('express');
 const expressions = require('./expressions.js')
 const app = express();
@@ -25,12 +24,8 @@ app.post('/eval', (req, res) => {
         console.log(`Recieved expression: ${expression}`)
         let cleanInput = expressions.clean(expression);
         if (cleanInput) {
-                let splitExp = expressions.splitByOps(expression);
-                let refactors = expressions.refactor(splitExp, expString);
-                splitExp = refactors.arr;
-                expString = refactors.expString;
-                let result = expressions.evalExp(splitExp);
-                expString += `=${result}`;
+                let result = expressions.parseExpression(expression);
+                expString = `${expression}=${result}`;
                 history.push(expString);
                 res.send(`${result}`);
                 initializeExpString();
