@@ -8,6 +8,8 @@ let ops = ['+', '-', '/', '*', '^'];
 
 let opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
 
+let expString = '';
+
 const PORT = 8000;
 
 //Collection of strings representing past mathematical expressions
@@ -27,33 +29,27 @@ app.post('/eval', (req, res) => {
         if (cleanInput) {
                 let splitExp = req.body.expression.split(opsRegex);
                 //console.log(splitExp);
-                let expression = '';
                 let result = 0;
-                let refactored = refactorToOpsAndRands(splitExp, expression);
-                expression = refactored.expString;
-                splitExp = refactored.arr;
+                splitExp = refactorToOpsAndRands(splitExp);
+
                 result = evalExp(splitExp);
-                console.log(result);
-                expression += `=${result}`;
-                history.push(expression);
+                //console.log(result);
+                expString += `=${result}`;
+                history.push(expString);
                 res.send(`${result}`);
+                expString = '';
         } else {
                 res.sendStatus(400);
         }
 });
 
-function refactorToOpsAndRands(arr, expString) {
+function refactorToOpsAndRands(arr) {
         for (let i in arr) {
                 if (evalOp(arr[i])) {
                         arr[i] = opToObject(arr[i]);
                         //console.log(arr);
-                        if (i != 0 && arr[i].op == '-' && ops.includes(arr[i - 1].op)) {
-                                arr[i] = arr[i].op + arr[Number(i) + 1];
-                                console.log(arr);
-                                arr.splice(Number(i) + 1, 1);
-                                i--;
-                                expString += arr[i+1];
-                        } else if (i == 0 && arr[i].op == '-'){
+                        if ((i != 0 && arr[i].op == '-' && ops.includes(arr[i - 1].op))
+                        || i == 0 && arr[i].op == '-') {
                                 arr[i] = arr[i].op + arr[Number(i) + 1];
                                 console.log(arr);
                                 arr.splice(Number(i) + 1, 1);
@@ -67,7 +63,7 @@ function refactorToOpsAndRands(arr, expString) {
                         expString += arr[i];
                 }
         }
-        return {arr, expString};
+        return arr;
 }
 
 app.listen(PORT, () => {
@@ -110,6 +106,10 @@ function recurParenthesis(arr, index) {
 function checkCleanInput(exp) {
         for (let i = 0; i < exp.length; i++) {
                 if (ops.includes(exp[i]) && ops.includes(exp[i - 1]) && exp[i] != '-') {
+                        return false;
+                } else if (exp[i] == '-'
+                && exp[i-1] == '-'
+                && exp[i-2] == '-') {
                         return false;
                 } else if (exp.match(/[A-Za-z]/) != undefined) {
                         return false;
