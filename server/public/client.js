@@ -10,9 +10,8 @@ function onReady() {
 }
 
 function getCalcValues() {
-        let num1 = $('#num-1').val();
-        let num2 = $('#num-2').val();
-        let payload = {expression: `${num1}|+|${num2}`};
+        let exp = $('#expression').val();
+        let payload = {expression: exp};
         postExpression(payload);
         getHistory();
 }
