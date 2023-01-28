@@ -7,26 +7,30 @@ const opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
 //prefix to prepend logs
 const expPrefix = 'Expressions:'
 
+function parseExpression(str) {
+        return Number(evalExp(refactor(splitByOps(str))));
+}
+
 //function for splitting array into operator objects and check for negative values following operators
-function refactor(arr, expString) {
+function refactor(arr) {
+        //iterate through array
         for (let i in arr) {
+                //check if array at index is a valid operator
                 if (evalOp(arr[i])) {
+                        //create operator object containing {op character, op function, weight}
                         arr[i] = opToObject(arr[i]);
+                        //check if first index is '-' or if array at i is '-' and is preceded by an operator
                         if ((i != 0 && arr[i].op == '-' && ops.includes(arr[i - 1].op))
                         || i == 0 && arr[i].op == '-') {
+                                //convert array at i to a string representing a negative version of proceeding value 
                                 arr[i] = arr[i].op + arr[Number(i) + 1];
+                                //remove proceeding value from array
                                 arr.splice(Number(i) + 1, 1);
                                 i--;
-                                expString += arr[i+1];
-                        } else {
-                                expString += arr[i].op;
                         }
-                }else {
-
-                        expString += arr[i];
                 }
         }
-        return {arr, expString};
+        return arr;
 }
 
 //function to begin evaluation of expression split into array an array containing operands and operator objects
@@ -99,7 +103,7 @@ function opToObject(op) {
 
 //function for checking validity of a string expression
 //returns true or false depending on validity of input
-function checkCleanInput(exp) {
+function clean(exp) {
         for (let i = 0; i < exp.length; i++) {
                 if (ops.includes(exp[i]) && ops.includes(exp[i - 1]) && exp[i] != '-') {
                         console.log(expPrefix, 'Input rejected for 2 consecutive operators (non-negative)');
@@ -108,6 +112,9 @@ function checkCleanInput(exp) {
                 && exp[i-1] == '-'
                 && exp[i-2] == '-') {
                         console.log(expPrefix, 'Input rejected for >2 consecutive \'-\' operators');
+                        return false;
+                } else if (evalOp(exp[exp.length -1])) {
+                        console.log(expPrefix, 'Input rejected for operator at end of expression');
                         return false;
                 } else if (exp.match(/[A-Za-z]/)) {
                         console.log(expPrefix, 'Input rejected for non-numeric characters');
@@ -118,8 +125,8 @@ function checkCleanInput(exp) {
 }
 
 //splits array by regex that looks for operators and maintains integrity of non-operator strings within array
-function splitByOps(arr){
-        return arr.split(opsRegex);
+function splitByOps(str){
+        return str.split(opsRegex);
 }
 
 //function for addition of an array of numbers
@@ -127,7 +134,7 @@ function splitByOps(arr){
 function add(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
-                console.log(expPrefix, `adding ${result} to ${nums[i]}`)
+                console.log(expPrefix, `${result} add ${nums[i]}`)
                 result += Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
@@ -139,7 +146,7 @@ function add(nums) {
 function sub(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
-                console.log(expPrefix, `subbing ${result} to ${nums[i]}`)
+                console.log(expPrefix, `${result} sub ${nums[i]}`)
                 result -= Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
@@ -151,7 +158,7 @@ function sub(nums) {
 function mult(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
-                console.log(expPrefix, `mult ${result} to ${nums[i]}`)
+                console.log(expPrefix, `${result} mult ${nums[i]}`)
                 result *= Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
@@ -163,7 +170,7 @@ function mult(nums) {
 function div(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
-                console.log(expPrefix, `div ${result} to ${nums[i]}`)
+                console.log(expPrefix, `${result} div ${nums[i]}`)
                 result /= Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
@@ -175,7 +182,7 @@ function div(nums) {
 function exp(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
-                console.log(expPrefix, `exp ${result} to pow ${nums[i]}`)
+                console.log(expPrefix, `${result} pow ${nums[i]}`)
                 result **= Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
@@ -216,4 +223,4 @@ function recurParenthesis(arr, index) {
         return result;
 }*/
 
-module.exports = {evalExp, refactor, clean: checkCleanInput, splitByOps}
+module.exports = {parseExpression, clean}

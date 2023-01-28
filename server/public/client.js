@@ -19,6 +19,7 @@ function getCalcValues() {
         let exp = $('#expression').val();
         let payload = {expression: exp};
         postExpression(payload);
+        $('#expression').val('');
         getHistory();
 }
 
@@ -30,15 +31,7 @@ function addToExpression() {
 }
 
 function postExpression(payload) {
-        renderLast(slay.post('/eval', payload));
-}
-
-function getHistory() {
-        renderHistory(slay.get('/history'));
-}
-
-function renderLast(promise) {
-        promise.then((res) => {
+        slay.post('/eval', payload).then((res) => {
                 let result = res;
                 render('#div-result', `<strong>${result}</strong>`);
         }).catch((err) => {
@@ -46,6 +39,14 @@ function renderLast(promise) {
                         render('#div-result', '<strong>Bad input, do not use letters or double operators (negative values following an operator are fine)</strong>')
                 }
         });
+}
+
+function getHistory() {
+        renderHistory(slay.get('/history'));
+}
+
+function renderLast(promise) {
+        promise
 }
 
 function renderHistory(promise) {
