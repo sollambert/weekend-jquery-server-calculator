@@ -1,8 +1,8 @@
 //array of accepted operators
-const ops = ['+', '-', '/', '*', '^', '%'];
+const ops = ['+', '-', '/', '*', '^'];
 
 //regex for splitting array by operator
-const opsRegex = new RegExp("(?<=[-+*/^%])|(?=[-+*/^%])");
+const opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
 
 //prefix to prepend logs
 const expPrefix = 'Expressions:'
@@ -72,8 +72,8 @@ function evalOp(operator) {
                         return mult;
                 case '/':
                         return div;
-                case '%':
-                        return mod;
+                // case '%':
+                //         return mod;
                 case '^':
                         return exp;
         }
@@ -203,7 +203,7 @@ function mod(nums) {
         let result = Number(nums[0]);
         for (let i = 1; i < nums.length; i++) {
                 console.log(expPrefix, `${result} mod ${nums[i]}`)
-                result %= Number(nums[i]);
+                result = result % Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
         return result;
