@@ -29,7 +29,7 @@ app.post('/eval', (req, res) => {
                 let refactors = expressions.refactor(splitExp, expString);
                 splitExp = refactors.arr;
                 expString = refactors.expString;
-                let result = expressions.evalExp(splitExp).toFixed(5);
+                let result = expressions.evalExp(splitExp);
                 expString += `=${result}`;
                 history.push(expString);
                 res.send(`${result}`);
