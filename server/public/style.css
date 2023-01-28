@@ -4,8 +4,29 @@ body {
 
 input {
         font-size: 2em;
+        width: 100%;
+}
+
+#expression {
+        width: 75%;
 }
 
 h2 {
         font-size: .25em;
+}
+
+.calc-btn {
+        grid-area: calc-btn;
+        width: 100%;
+}
+
+#div-inputs {
+        display: grid;
+        grid-gap: 1rem;
+        grid-template:
+          [row1-start] "calc-btn calc-btn calc-btn calc-btn ." auto [row1-end]
+          [row2-start] "calc-btn calc-btn calc-btn calc-btn ." auto [row2-end]
+          [row3-start] "calc-btn calc-btn calc-btn calc-btn calc-btn" auto [row3-end]
+          [row4-start] "calc-btn calc-btn calc-btn calc-btn calc-btn" auto [row4-end]
+          / auto auto auto;
 }

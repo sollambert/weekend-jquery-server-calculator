@@ -1,8 +1,8 @@
 //array of accepted operators
-const ops = ['+', '-', '/', '*', '^'];
+const ops = ['+', '-', '/', '*', '^', '%'];
 
 //regex for splitting array by operator
-const opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
+const opsRegex = new RegExp("(?<=[-+*/^%])|(?=[-+*/^%])");
 
 //prefix to prepend logs
 const expPrefix = 'Expressions:'
@@ -72,6 +72,8 @@ function evalOp(operator) {
                         return mult;
                 case '/':
                         return div;
+                case '%':
+                        return mod;
                 case '^':
                         return exp;
         }
@@ -90,6 +92,9 @@ function opToObject(op) {
                         wgt = 2;
                         break;
                 case '/':
+                        wgt = 2;
+                        break;
+                case '%':
                         wgt = 2;
                         break;
                 case '+':
@@ -112,6 +117,9 @@ function clean(exp) {
                 && exp[i-1] == '-'
                 && exp[i-2] == '-') {
                         console.log(expPrefix, 'Input rejected for >2 consecutive \'-\' operators');
+                        return false;
+                } else if (evalOp(exp[0])) {
+                        console.log(expPrefix, 'Input rejected for operator at start of expression');
                         return false;
                 } else if (evalOp(exp[exp.length -1])) {
                         console.log(expPrefix, 'Input rejected for operator at end of expression');
@@ -184,6 +192,18 @@ function exp(nums) {
         for (let i = 1; i < nums.length; i++) {
                 console.log(expPrefix, `${result} pow ${nums[i]}`)
                 result **= Number(nums[i]);
+        }
+        console.log(expPrefix, 'result', result);
+        return result;
+}
+
+//function for modulo of an array of numbers
+//returns total modulo of elements of array starting with the first value
+function mod(nums) {
+        let result = Number(nums[0]);
+        for (let i = 1; i < nums.length; i++) {
+                console.log(expPrefix, `${result} mod ${nums[i]}`)
+                result %= Number(nums[i]);
         }
         console.log(expPrefix, 'result', result);
         return result;
