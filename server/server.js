@@ -4,9 +4,9 @@ const app = express();
 app.use(express.static('server/public'));
 app.use(express.urlencoded({ extended: true }));
 
-let ops = ['+', '-', '/', '*'];
+let ops = ['+', '-', '/', '*', '^'];
 
-let opsRegex = new RegExp("(?<=[-+*/])|(?=[-+*/])");
+let opsRegex = new RegExp("(?<=[-+*/^])|(?=[-+*/^])");
 
 const PORT = 8000;
 
@@ -21,33 +21,18 @@ app.get('/history', (req, res) => {
 });
 
 app.post('/eval', (req, res) => {
-        console.log(req.body.expression)
+        console.log(req.body.expression);
         let cleanInput = checkCleanInput(req.body.expression);
+        console.log(cleanInput);
         if (cleanInput) {
                 let splitExp = req.body.expression.split(opsRegex);
-                console.log(splitExp);
+                //console.log(splitExp);
                 let expression = '';
                 let result = 0;
-                for (let i in splitExp) {
-                        if (evalOp(splitExp[i])) {
-                                splitExp[i] = opToObject(splitExp[i]);
-                                //console.log(splitExp);
-                                if (splitExp[i].op == '-' && ops.includes(splitExp[i - 1].op)) {
-                                        splitExp[i] = splitExp[i].op + splitExp[Number(i) + 1];
-                                        console.log(splitExp);
-                                        splitExp.splice(Number(i) + 1, 1);
-                                        i--;
-                                        expression += splitExp[i+1];
-                                } else{
-
-                                expression += splitExp[i].op;
-                                }
-                        }else {
-
-                                expression += splitExp[i];
-                        }
-                }
-                result = evaluateExp(splitExp);
+                let refactored = refactorToOpsAndRands(splitExp, expression);
+                expression = refactored.expString;
+                splitExp = refactored.arr;
+                result = evalExp(splitExp);
                 console.log(result);
                 expression += `=${result}`;
                 history.push(expression);
@@ -56,6 +41,34 @@ app.post('/eval', (req, res) => {
                 res.sendStatus(400);
         }
 });
+
+function refactorToOpsAndRands(arr, expString) {
+        for (let i in arr) {
+                if (evalOp(arr[i])) {
+                        arr[i] = opToObject(arr[i]);
+                        //console.log(arr);
+                        if (i != 0 && arr[i].op == '-' && ops.includes(arr[i - 1].op)) {
+                                arr[i] = arr[i].op + arr[Number(i) + 1];
+                                console.log(arr);
+                                arr.splice(Number(i) + 1, 1);
+                                i--;
+                                expString += arr[i+1];
+                        } else if (i == 0 && arr[i].op == '-'){
+                                arr[i] = arr[i].op + arr[Number(i) + 1];
+                                console.log(arr);
+                                arr.splice(Number(i) + 1, 1);
+                                i--;
+                                expString += arr[i+1];
+                        } else {
+                                expString += arr[i].op;
+                        }
+                }else {
+
+                        expString += arr[i];
+                }
+        }
+        return {arr, expString};
+}
 
 app.listen(PORT, () => {
 
@@ -72,7 +85,7 @@ app.listen(PORT, () => {
         }
         for (let i = 0; i < arr.length; i ++) {
                 if (arr[i] == ')') {
-                        result = evaluateExp(arr.slice(arr.slice(0,i-1).lastIndexOf('('), i));
+                        result = evalExp(arr.slice(arr.slice(0,i-1).lastIndexOf('('), i));
                 }
         }
         return result;
@@ -88,7 +101,7 @@ function recurParenthesis(arr, index) {
         }
         for (let i = 0; i < arr.length; i ++) {
                 if (arr[i] == ')') {
-                        result = evaluateExp(arr.splice(arr.lastIndexOf('('), i));
+                        result = evalExp(arr.splice(arr.lastIndexOf('('), i));
                 }
         }
         return result;
@@ -105,20 +118,30 @@ function checkCleanInput(exp) {
         return true;
 }
 
-function evaluateExp(arr) {
+
+function evalExp(arr) {
         console.log(arr);
         let weight = 3;
         let result = 0;
         while (weight > 0) {
-                for (let i = 0; i < arr.length; i++) {
-                        if (arr[i].wgt == weight) {
-                                arr[i - 1] = arr[i].func([arr[i - 1], arr[Number(i) + 1]]);
-                                arr.splice(i, 2);
-                                i -= 2;
-                                result = arr[i + 1];
-                        }
+                let weightedResult = evalWeightedExp(arr, weight);
+                if (weightedResult != 0) {
+                        result = weightedResult;
                 }
                 weight--;
+        }
+        return result;
+}
+
+function evalWeightedExp(arr, weight) {
+        let result = 0;
+        for (let i = 0; i < arr.length; i++) {
+                if (arr[i].wgt == weight) {
+                        arr[i - 1] = arr[i].func([arr[i - 1], arr[Number(i) + 1]]);
+                        arr.splice(i, 2);
+                        i -= 2;
+                        result = arr[i + 1];
+                }
         }
         return result;
 }
@@ -126,6 +149,9 @@ function evaluateExp(arr) {
 function opToObject(op) {
         let wgt = 0;
         switch (op) {
+                case '^':
+                        wgt = 3;
+                        break;
                 case '*':
                         wgt = 2;
                         break;
@@ -139,12 +165,6 @@ function opToObject(op) {
                         wgt = 1;
         }
         return { op, func: evalOp(op), wgt }
-}
-
-function factorOrder(arr) {
-        for (let i in arr) {
-        }
-        return arr.sort((a, b) => b.wgt - a.wgt);
 }
 
 function add(nums) {
@@ -187,6 +207,16 @@ function div(nums) {
         return result;
 }
 
+function exp(nums) {
+        let result = Number(nums[0]);
+        for (let i = 1; i < nums.length; i++) {
+                console.log(`exp ${result} to pow ${nums[i]}`)
+                result **= Number(nums[i]);
+        }
+        console.log('result', result);
+        return result;
+}
+
 
 function evalOp(operator) {
         switch (operator) {
@@ -198,6 +228,8 @@ function evalOp(operator) {
                         return mult;
                 case '/':
                         return div;
+                case '^':
+                        return exp;
         }
         return;
 }

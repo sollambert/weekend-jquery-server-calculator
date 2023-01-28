@@ -42,8 +42,8 @@ function renderLast(promise) {
                 let result = res;
                 render('#div-result', `<strong>${result}</strong>`);
         }).catch((err) => {
-                if (err == 400) {
-                        render('#div-result', '<strong>Bad input, do not use letters or double operators (negative values following an operator are fine)<strong>')
+                if (err.status == 400) {
+                        render('#div-result', '<strong>Bad input, do not use letters or double operators (negative values following an operator are fine)</strong>')
                 }
         });
 }
