@@ -10,13 +10,19 @@ let expString = '';
 const PORT = 8000;
 
 //Collection of strings representing past mathematical expressions
-const history = [];
+let history = [];
 
 /**
  * Sends history array as payload when recieving a GET on /history
  */
 app.get('/history', (req, res) => {
         res.send(history);
+});
+
+app.delete('/history', (req, res) => {
+        history = [];
+        console.log('History cleared.')
+        res.sendStatus(200);
 });
 
 app.post('/eval', (req, res) => {

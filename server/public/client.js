@@ -8,11 +8,17 @@ function onReady() {
         $(document).on('click', '#eq-btn', getCalcValues);
         $(document).on('click', '.calc-btn', addToExpression);
         $(document).on('click', '#clr-btn', clearExp);
+        $(document).on('click', '#clr-history-btn', clearHistory);
         getHistory();
 }
 
 function clearExp() {
         $('#expression').val('');
+}
+
+function clearHistory() {
+        slay.del('/history');
+        getHistory();
 }
 
 function getCalcValues() {
