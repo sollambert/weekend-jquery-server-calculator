@@ -9,6 +9,7 @@ function onReady() {
         $(document).on('click', '.calc-btn', addToExpression);
         $(document).on('click', '#clr-btn', clearExp);
         $(document).on('click', '#clr-history-btn', clearHistory);
+        $(document).on('click', '.history', redoExpression);
         getHistory();
 }
 
@@ -19,6 +20,12 @@ function clearExp() {
 function clearHistory() {
         slay.del('/history');
         getHistory();
+}
+
+function redoExpression () {
+        let expString = $(this).text();
+        expString = expString.split('=')[0];
+        $('#expression').val(expString);
 }
 
 function getCalcValues() {
@@ -63,7 +70,7 @@ function renderHistory(promise) {
                 for (let i in history) {
                         renderString += `
                         <div id='history-${i}'>
-                          <p>${history[i]}</p>
+                          <p class='history'>${history[i]}</p>
                         </div>`
                 }
                 render('#div-history', renderString);
