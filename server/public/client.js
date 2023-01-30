@@ -31,7 +31,11 @@ function redoExpression () {
 function getCalcValues() {
         let exp = $('#expression').val();
         let payload = {expression: exp};
-        postExpression(payload);
+        if (!exp.match(/[^0-9.^*\/+-]/)) {
+                postExpression(payload);
+        } else {
+                render('#div-result', '<strong>Bad input, do not use letters or double operators (negative values following an operator are fine)</strong>')
+        }
         $('#expression').val('');
         getHistory();
 }

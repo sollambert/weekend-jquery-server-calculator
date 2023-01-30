@@ -124,7 +124,7 @@ function clean(exp) {
                 } else if (evalOp(exp[exp.length -1])) {
                         console.log(expPrefix, 'Input rejected for operator at end of expression');
                         return false;
-                } else if (exp.match(/[A-Za-z]/)) {
+                } else if (exp.match(/[^0-9.^*\/+-]/)) {
                         console.log(expPrefix, 'Input rejected for non-numeric characters');
                         return false;
                 }
