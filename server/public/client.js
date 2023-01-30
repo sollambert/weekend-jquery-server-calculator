@@ -62,10 +62,6 @@ function getHistory() {
         renderHistory(slay.get('/history'));
 }
 
-function renderLast(promise) {
-        promise
-}
-
 function renderHistory(promise) {
         promise.then((res) => {
                 let history = res;
